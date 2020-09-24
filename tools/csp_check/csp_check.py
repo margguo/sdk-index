@@ -18,9 +18,10 @@ def execute_command(cmd_string, cwd=None, shell=True):
 
 
 def main():
-    execute_command("apt update && apt -y upgrade && apt -y install unzip")
+    execute_command("apt-get update && apt-get -y upgrade && apt-get -y install unzip")
     os.chdir("/rt-thread/sdk-index/tools/csp_check")
     execute_command("chmod 777 prj_gen")
+    execute_command("python -m pip install --upgrade pip")
     execute_command("pip install pyyaml pytest-sugar pytest-parallel")
     os.system("python project_build.py")
 
