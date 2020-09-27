@@ -4,7 +4,7 @@ import time
 import logging
 import random
 import textwrap
-from csp_check import execute_command
+from check_tools import execute_command
 
 
 def gen_chip_test_case(json_path, mcu_config_path):
@@ -12,13 +12,14 @@ def gen_chip_test_case(json_path, mcu_config_path):
     test_case = ''
     for chip_json in os.listdir(mcu_config_path):
         project_name = chip_json.split(".json")[0]
-        test_case_example = """ 
+        test_case_example = """
                 def test_{0}():
                     assert csp_test("{0}") is True
                 """.format(project_name)
         test_case_format = textwrap.dedent(test_case_example)
         test_case += "\n" + test_case_format
         chip_json_path = os.path.join(mcu_config_path, chip_json)
+
         execute_command("rm -rf {0}".format(chip_json_path))
     with open("csp_test_case.py", "a") as f:
         f.write(test_case)
@@ -67,7 +68,13 @@ def generate_and_import_project(json_path, mcu_config_path):
 
 
 def get_generate_result(csp_json_path):
-    cmd = r"./prj_gen --csp_project=true --csp_parameter_file={0} -n xxx 2> generate.log".format(csp_json_path)
+    execute_command("chmod 777 /RT-ThreadStudio/plugins/gener/prj_gen")
+    check_type = os.environ['SDK_CHECK_TYPE']
+    if check_type.find("csp_check") != -1:
+        cmd = r"/RT-ThreadStudio/plugins/gener/prj_gen --csp_project=true --csp_parameter_file={0} -n xxx 2> generate.log".format(csp_json_path)
+    else:
+        cmd = r"/RT-ThreadStudio/plugins/gener/prj_gen --bsp_project=true --bsp_parameter_file={0} -n xxx 2> generate.log".format(csp_json_path)
+
     execute_command(cmd)
     try:
         with open("generate.log", "r") as f:
@@ -77,3 +84,5 @@ def get_generate_result(csp_json_path):
     for line in log_info:
         if line.find("Error") != -1 or line.find("error") != -1 or line.find("ERROR") != -1:
             logging.error(line)
+        else:
+            logging.debug(line)

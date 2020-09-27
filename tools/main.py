@@ -238,10 +238,10 @@ class SdkSyncPackages:
 
     def sync_csp_packages(self):
         if self.is_master_repo():
-            logging.info("Ready to sync csp packages")
+            logging.info("Ready to sync csp or bsp packages")
             self.do_sync_csp_packages()
         else:
-            logging.info("No need to sync csp packages")
+            logging.info("No need to sync csp or bsp packages")
 
     @staticmethod
     def do_update_sdk_ide_index(index):

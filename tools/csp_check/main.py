@@ -1,21 +1,11 @@
+import os
+import sys
 import time
 import json
 import logging
 import subprocess
-
-
-def execute_command(cmd_string, cwd=None, shell=True):
-    """Execute the system command at the specified address."""
-
-    sub = subprocess.Popen(cmd_string, cwd=cwd, stdin=subprocess.PIPE,
-                           stdout=subprocess.PIPE, shell=shell, bufsize=4096)
-
-    stdout_str = ''
-    while sub.poll() is None:
-        stdout_str += str(sub.stdout.read(), encoding="UTF-8")
-        time.sleep(0.1)
-
-    return stdout_str
+from bsp_check import bsp_check_test
+from check_tools import execute_command
 
 
 def init_logger():
@@ -26,17 +16,22 @@ def init_logger():
                         datefmt=date_format,
                         )
 
-
 def main():
     init_logger()
+    execute_command("apt-get update && apt-get -y upgrade && apt-get -y install unzip")
+    os.chdir("/rt-thread/sdk-index/tools/csp_check")
     execute_command("python -m pip install --upgrade pip")
+    result = execute_command("pip install rt-thread-studio")
+    logging.info("{0}".format(result))
     # get update csp url
     try:
         with open('/rt-thread/sdk-index/tools/csp_update_url.json', "r") as f:
             sdk_url = json.loads(f.read())[0]
         # csp ci check
-        logging.info("csp check test!")
-        exit(0)
+        logging.info("csp check test! : {0}".format(sdk_url))
+        os.system("export SDK_CHECK_TYPE=csp_check")
+        # os.sytem("python csp_check.py")
+        sys.exit(0)
     except Exception as e:
         logging.error("\nError message : {0}.".format(e))
 
@@ -45,11 +40,14 @@ def main():
         with open('/rt-thread/sdk-index/tools/bsp_update_url.json', "r") as f:
             sdk_url = json.loads(f.read())[0]
         # bsp ci chck
-        logging.info("bsp check test!")
-        exit(0)
+        logging.info("bsp check test! : {0}".format(sdk_url))
+        os.system("export SDK_CHECK_TYPE='csp_check'")
+        bsp_check_test()
+        sys.exit(0)
     except Exception as e:
         logging.error("\nError message : {0}.".format(e))
-        exit(1)
+        sys.exit(1)
+
 
 if __name__ == "__main__":
     main()
