@@ -7,15 +7,6 @@ from gen_test_case import gen_chip_test_case
 from csp_check import execute_command
 
 
-def init_logger():
-    log_format = "[%(filename)s %(lineno)d %(levelname)s] %(message)s "
-    date_format = '%Y-%m-%d  %H:%M:%S %a '
-    logging.basicConfig(level=logging.INFO,
-                        format=log_format,
-                        datefmt=date_format,
-                        )
-
-
 def get_rt_thread_source_code():
     try:
         with open(r"/rt-thread/sdk-index/RT-Thread_Source_Code/index.json", "r") as f:
@@ -48,7 +39,6 @@ def get_rt_thread_source_code():
 
 def csp_build_test():
     # init logging
-    init_logger()
     # get rt-thread_sourcr_code : nano and released
     get_rt_thread_source_code()
     # get update csp url

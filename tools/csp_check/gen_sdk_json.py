@@ -24,7 +24,8 @@ para_json_tmp = """
    "project_name": "$project_name",
    "output_project_path": "$output_project_path"
    }
-}"""
+}
+"""
 
 
 def init_logger():
