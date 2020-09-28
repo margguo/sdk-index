@@ -69,20 +69,29 @@ def generate_and_import_project(json_path, mcu_config_path):
 
 def get_generate_result(csp_json_path):
     execute_command("chmod 777 /RT-ThreadStudio/plugins/gener/prj_gen")
-    check_type = os.environ['SDK_CHECK_TYPE']
+    # judge sdk update type (csp or bsp)
+    try:
+        check_type = os.environ['SDK_CHECK_TYPE']
+    except Exception as e:
+        logging.error(": {0}".format(e))
+
+    logging.debug("project_json_info: {0}".format(check_type))
+    os.system("cat {0}".format(csp_json_path))
+
     if check_type.find("csp_check") != -1:
         cmd = r"/RT-ThreadStudio/plugins/gener/prj_gen --csp_project=true --csp_parameter_file={0} -n xxx 2> generate.log".format(csp_json_path)
     else:
         cmd = r"/RT-ThreadStudio/plugins/gener/prj_gen --bsp_project=true --bsp_parameter_file={0} -n xxx 2> generate.log".format(csp_json_path)
-
     execute_command(cmd)
+
     try:
         with open("generate.log", "r") as f:
             log_info = f.readlines()
     except Exception as e:
         print("Error message : {0}".format(e))
-    for line in log_info:
-        if line.find("Error") != -1 or line.find("error") != -1 or line.find("ERROR") != -1:
-            logging.error(line)
-        else:
-            logging.debug(line)
+    else:
+        for line in log_info:
+            if line.find("Error") != -1 or line.find("error") != -1 or line.find("ERROR") != -1:
+                logging.error(line)
+            else:
+                logging.debug(line)

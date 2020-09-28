@@ -7,7 +7,18 @@ from gen_bsp_json import gen_bsp_sdk_json
 from gen_test_case import gen_chip_test_case
 
 
+def init_logger():
+    log_format = "[%(filename)s %(lineno)d %(levelname)s] %(message)s "
+    date_format = '%Y-%m-%d  %H:%M:%S %a '
+    logging.basicConfig(level=logging.DEBUG,
+                        format=log_format,
+                        datefmt=date_format,
+                        )
+
+
 def bsp_check_test():
+    init_logger()
+    os.environ['SDK_CHECK_TYPE'] = 'bsp_check'
     with open('/rt-thread/sdk-index/tools/bsp_update_url.json', "r") as f:
         bsp_update_url = json.loads(f.read())[0]
 
@@ -25,10 +36,12 @@ def bsp_check_test():
     for dir in os.listdir("/rt-thread/rt-thread-bsp"):
         if dir.find("sdk-bsp") != -1:
             real_bsp_path = os.path.join("/rt-thread/rt-thread-bsp", dir)
+            logging.info("bsp path : {0}".format(real_bsp_path))
             break
     if real_bsp_path is None:
         logging.error("can't find bsp path, please check it!")
 
+    os.system("ls -al {0}".format(real_bsp_path))
     gen_bsp_sdk_json(real_bsp_path, "/rt-thread/sdk-index/", "/rt-thread/workspace/")
     # gen test case
     gen_chip_test_case("bsp_chips.json", "mcu_config")

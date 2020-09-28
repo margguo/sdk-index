@@ -4,7 +4,6 @@ import time
 import json
 import logging
 import subprocess
-from bsp_check import bsp_check_test
 from check_tools import execute_command
 
 
@@ -41,8 +40,7 @@ def main():
             sdk_url = json.loads(f.read())[0]
         # bsp ci chck
         logging.info("bsp check test! : {0}".format(sdk_url))
-        os.system("export SDK_CHECK_TYPE='csp_check'")
-        bsp_check_test()
+        os.system("python bsp_check.py")
         sys.exit(0)
     except Exception as e:
         logging.error("\nError message : {0}.".format(e))
